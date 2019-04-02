@@ -152,8 +152,32 @@
      expensesLabel: '.budget__expenses--value',
      percentageLabel: '.budget__expenses--percentage',
      container: '.container',
-     expPercentLabel: '.item__percentage'
+     expPercentLabel: '.item__percentage',
+     dateLabel: '.budget__title--month'
    };
+   var formatNumber = function(num,type){
+     var int,dec,numSplit,sign;
+
+     num = Math.abs(num);
+     num = num.toFixed(2);
+
+     numSplit = num.split('.');
+
+     int = numSplit[0];
+
+     if (int.length > 3) {
+      int = int.substr(0,int.length - 3) + ',' + int.substr(int.length - 3,3); 
+    }
+    dec = numSplit[1];
+
+    return (type === 'exp' ? '-' : '+') + ' ' + int + '.' + dec;
+  };
+
+  var nodeListForEach = function(list,callb){
+    for (var i = 0; i < list.length; i++) {
+      callb(list[i], i);
+    }
+  };
 
    return {
      getInput: function(){
@@ -181,7 +205,7 @@
        // replace place holders with real data
        newHtml = html.replace('%id%',obj.id);
        newHtml = newHtml.replace('%description%', obj.description);
-       newHtml = newHtml.replace('%value%',obj.value);
+       newHtml = newHtml.replace('%value%',formatNumber(obj.value,type));
 
        // insert HTML into the DOM
        document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
@@ -209,9 +233,12 @@
       },
 
       displayBudget: function(obj){
-        document.querySelector(domStrings.budgetLabel).textContent = obj.budget;
-        document.querySelector(domStrings.incomeLabel).textContent = obj.totalInc;
-        document.querySelector(domStrings.expensesLabel).textContent = obj.totalExp;
+        var type;
+        obj.budget > 0 ? type = 'inc': type = 'exp';
+
+        document.querySelector(domStrings.budgetLabel).textContent = formatNumber(obj.budget,type);
+        document.querySelector(domStrings.incomeLabel).textContent = formatNumber(obj.totalInc, 'inc');
+        document.querySelector(domStrings.expensesLabel).textContent = formatNumber(obj.totalExp, 'exp');
 
         if (obj.percentage > 0) {
           document.querySelector(domStrings.percentageLabel).textContent = obj.percentage + '%';
@@ -226,12 +253,6 @@
 
         var fields = document.querySelectorAll(domStrings.expPercentLabel);
 
-        var nodeListForEach = function(list,callb){
-          for (var i = 0; i < list.length; i++) {
-            callb(list[i], i);
-          }
-        };
-
         nodeListForEach(fields,function(curr,index){
           if (percentage[index] > 0) {
             curr.textContent = percentage[index] + '%';
@@ -243,14 +264,24 @@
 
       },
 
-      formatNumber: function(num,type){
-        num = Math.abs(num);
-        num = num.toFixed(2);
+      displayMonth: function(){
+        var now,year,months;
+        now = new Date();
+        months = ['January', 'February','March','April','May','June','July','August','September','October','November','December'];
+        month = now.getMonth();
+        year = now.getFullYear();
+        document.querySelector(domStrings.dateLabel).textContent = months[month] + ' ' + year;
+      },
 
-        numsplit = num.split('.');
+      changeType: function(){
+        var fields;
+        fields = document.querySelectorAll(domStrings.inputType + ',' + domStrings.inputDescription + ',' + domStrings.inputValue);
 
-        int = numsplit[0];
-        dec = numSplit[1];
+      nodeListForEach(fields, function(curr){
+        curr.classList.toggle('red-focus');
+      });
+      document.querySelector(domStrings.inputBtn).classList.toggle('red');
+
       },
 
        getDomStrings: function() {
@@ -276,6 +307,10 @@ var appController = (function(budgetCtr,UiCtr){
     });
 
     document.querySelector(dom.container).addEventListener('click',ctrlDeletItem);
+
+    document.querySelector(dom.inputType).addEventListener('change', UiCtr.changeType);
+
+
   };
 
 
@@ -340,6 +375,7 @@ var appController = (function(budgetCtr,UiCtr){
 return {
   init: function(){
     console.log('started');
+    UiCtr.displayMonth();
     UiCtr.displayBudget({budget: 0,
       totalInc: 0,
       totalExp: 0,
