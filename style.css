@@ -33,7 +33,7 @@ body {
 
 .top {
     height: 54vh;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.10), rgba(0, 0, 0, 0.10)), url(./alexandru.jpg);
+    background-image: url(./alexandru.jpg);
     background-size: cover;
     background-position: center;
     position: relative;
