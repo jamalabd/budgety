@@ -231,7 +231,6 @@
         fieldsArray[0].focus();
 
       },
-
       displayBudget: function(obj){
         var type;
         obj.budget > 0 ? type = 'inc': type = 'exp';

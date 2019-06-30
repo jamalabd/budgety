@@ -257,7 +257,6 @@ h2 {
     line-height: 1;
     display: none;
 }
-
 .item__delete--btn:focus { outline: none; }
 .item__delete--btn:active { transform: translateY(2px); }
 
